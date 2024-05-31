@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>编辑监控设置</title>
+</head>
+<body>
+    <h1>编辑监控设置</h1>
+    <form action="/edit_threshold/{{ record['id'] }}" method="post">
+        <label for="symbol">期货标的:</label>
+        <input type="text" id="symbol" name="symbol" value="{{ record['symbol'] }}" readonly><br><br>
+        <label for="target_price">目标价格:</label>
+        <input type="text" id="target_price" name="target_price" value="{{ record['target_price'] }}" required><br><br>
+        <label for="condition">提醒条件:</label>
+        <select id="condition" name="condition" required>
+            <option value=">" {% if record['condition'] == '>' %}selected{% endif %}>大于</option>
+            <option value=">=" {% if record['condition'] == '>=' %}selected{% endif %}>大于等于</option>
+            <option value="<" {% if record['condition'] == '<' %}selected{% endif %}>小于</option>
+            <option value="<=" {% if record['condition'] == '<=' %}selected{% endif %}>小于等于</option>
+        </select><br><br>
+        <label for="is_active">是否监控:</label>
+        <select id="is_active" name="is_active" required>
+            <option value="true" {% if record['is_active'] %}selected{% endif %}>是</option>
+            <option value="false" {% if not record['is_active'] %}selected{% endif %}>否</option>
+        </select><br><br>
+        <label for="is_displayed">是否显示:</label>
+        <select id="is_displayed" name="is_displayed" required>
+            <option value="true" {% if record['is_displayed'] %}selected{% endif %}>是</option>
+            <option value="false" {% if not record['is_displayed'] %}selected{% endif %}>否</option>
+        </select><br><br>
+        <input type="submit" value="保存">
+    </form>
+</body>
+</html>

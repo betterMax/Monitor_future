@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>期货监控</title>
+</head>
+<body>
+    <h1>设置监控期货标的和阈值</h1>
+    <form action="/set_threshold" method="post">
+        <label for="symbol">期货标的:</label>
+        <input type="text" id="symbol" name="symbol" required><br><br>
+        <label for="target_price">目标价格:</label>
+        <input type="text" id="target_price" name="target_price" required><br><br>
+        <label for="condition">提醒条件:</label>
+        <select id="condition" name="condition" required>
+            <option value=">">大于</option>
+            <option value=">=">大于等于</option>
+            <option value="<">小于</option>
+            <option value="<=">小于等于</option>
+        </select><br><br>
+        <label for="is_active">是否监控:</label>
+        <select id="is_active" name="is_active" required>
+            <option value="true">是</option>
+            <option value="false">否</option>
+        </select><br><br>
+        <label for="is_displayed">是否显示:</label>
+        <select id="is_displayed" name="is_displayed" required>
+            <option value="true">是</option>
+            <option value="false">否</option>
+        </select><br><br>
+        <input type="submit" value="设置">
+    </form>
+
+    <h2>监控列表</h2>
+    <table border="1">
+        <tr>
+            <th>期货标的</th>
+            <th>目标价格</th>
+            <th>条件</th>
+            <th>创建时间</th>
+            <th>是否监控</th>
+            <th>操作</th>
+        </tr>
+        {% for record in records %}
+        <tr>
+            <td>{{ record['symbol'] }}</td>
+            <td>{{ record['target_price'] }}</td>
+            <td>{{ record['condition'] }}</td>
+            <td>{{ record['created_at'] }}</td>
+            <td>{{ record['is_active'] }}</td>
+            <td>
+                <a href="/edit_threshold/{{ record['id'] }}">编辑</a> |
+                <a href="/toggle_display/{{ record['id'] }}">取消显示</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
