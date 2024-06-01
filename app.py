@@ -39,6 +39,7 @@ def set_threshold():
         INSERT INTO monitor_settings (symbol, target_price, condition, is_active, is_displayed)
         VALUES (?, ?, ?, ?, ?)
     ''', (symbol, target_price, condition, is_active, is_displayed))
+    print("插入记录：", symbol, target_price, condition, is_active, is_displayed)
     conn.commit()
     conn.close()
 
