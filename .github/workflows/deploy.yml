@@ -20,4 +20,4 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh -o StrictHostKeyChecking=no username@your-server "cd /path/to/your/project && git pull && ./deploy.sh"
+        ssh -o StrictHostKeyChecking=no root@121.43.96.147 "cd /root/app/Monitor_future && git pull && ./deploy.sh"
