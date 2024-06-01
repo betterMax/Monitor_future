@@ -18,6 +18,15 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    - name: Print working directory
+      run: pwd
+
+    - name: List files
+      run: ls -la
+
+    - name: Test SSH connection
+      run: ssh -o StrictHostKeyChecking=no root@121.43.96.147 "echo 'SSH connection successful'"
+
     - name: Deploy to server
       run: |
         ssh -o StrictHostKeyChecking=no root@121.43.96.147 "cd /root/app/Monitor_future && git pull && ./deploy.sh"
