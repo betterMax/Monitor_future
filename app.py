@@ -19,10 +19,20 @@ def index():
     # 获取所有显示且被监控的记录
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM monitor_settings WHERE is_displayed = 1 AND is_active = 1')
+    cursor.execute('SELECT * FROM monitor_settings WHERE is_displayed = 1 AND is_active = 1 order by symbol, code, type')
     records = cursor.fetchall()
     conn.close()
     return render_template('index.html', records=records)
+
+
+@app.route('/monitoring_types')
+def monitoring_types():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM monitoring_types')
+    types = cursor.fetchall()
+    conn.close()
+    return render_template('monitoring_types.html', types=types)
 
 
 @app.route('/set_threshold', methods=['POST'])
@@ -85,4 +95,4 @@ def toggle_display(id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)

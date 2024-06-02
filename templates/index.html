@@ -8,6 +8,14 @@
     <form action="/set_threshold" method="post">
         <label for="symbol">期货标的:</label>
         <input type="text" id="symbol" name="symbol" required><br><br>
+        <label for="future_code">期货代码:</label>
+        <input type="text" id="future_code" name="future_code" required><br><br>
+        <label for="monitor_type">监控类别:</label>
+        <select id="monitor_type" name="monitor_type" required>
+            {% for type in monitoring_types %}
+            <option value="{{ monitor_type.name }}">{{ type.name }}</option>
+            {% endfor %}
+        </select><br><br>
         <label for="target_price">目标价格:</label>
         <input type="text" id="target_price" name="target_price" required><br><br>
         <label for="condition">提醒条件:</label>
@@ -34,6 +42,8 @@
     <table border="1">
         <tr>
             <th>期货标的</th>
+            <th>期货代码</th>
+            <th>监控类别</th>
             <th>目标价格</th>
             <th>条件</th>
             <th>创建时间</th>
@@ -43,6 +53,8 @@
         {% for record in records %}
         <tr>
             <td>{{ record['symbol'] }}</td>
+            <td>{{ record['future_code'] }}</td>
+            <td>{{ record['monitor_type'] }}</td>
             <td>{{ record['target_price'] }}</td>
             <td>{{ record['condition'] }}</td>
             <td>{{ record['created_at'] }}</td>
