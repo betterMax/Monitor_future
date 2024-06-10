@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>监控类别管理</title>
+</head>
+<body>
+    <h1>监控类别管理</h1>
+
+    <!-- 监控类别列表 -->
+    <h2>现有监控类别</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>监控类别</th>
+        </tr>
+        {% for record in monitoring_types %}
+        <tr>
+            <td>{{ record['id'] }}</td>
+            <td>{{ record['monitor_type'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- 添加新监控类别 -->
+    <h2>添加新监控类别</h2>
+    <form action="/add_monitoring_type" method="post">
+        <label for="monitor_type">监控类别:</label>
+        <input type="text" id="monitor_type" name="monitor_type" required><br><br>
+        <input type="submit" value="添加">
+    </form>
+
+    <!-- 其他页面的按钮 -->
+    <a href="/">返回记录</a><br>
+</body>
+</html>

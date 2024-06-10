@@ -8,6 +8,8 @@
     <form action="/edit_threshold/{{ record['id'] }}" method="post">
         <label for="symbol">期货标的:</label>
         <input type="text" id="symbol" name="symbol" value="{{ record['symbol'] }}" readonly><br><br>
+        <label for="future_code">期货完整代码:</label>
+        <input type="text" id="future_code" name="future_code" value="{{ record['future_code'] }}" required><br><br>
         <label for="target_price">目标价格:</label>
         <input type="text" id="target_price" name="target_price" value="{{ record['target_price'] }}" required><br><br>
         <label for="condition">提醒条件:</label>

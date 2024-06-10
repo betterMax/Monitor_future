@@ -2,69 +2,181 @@
 <html>
 <head>
     <title>期货监控</title>
+    <style>
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>设置监控期货标的和阈值</h1>
-    <form action="/set_threshold" method="post">
+    <h1>期货监控</h1>
+
+    <!-- 筛选项 -->
+    <form action="/" method="get">
         <label for="symbol">期货标的:</label>
-        <input type="text" id="symbol" name="symbol" required><br><br>
-        <label for="future_code">期货代码:</label>
-        <input type="text" id="future_code" name="future_code" required><br><br>
+        <input type="text" id="symbol" name="symbol" value="{{ request.args.get('symbol', '') }}"><br><br>
         <label for="monitor_type">监控类别:</label>
-        <select id="monitor_type" name="monitor_type" required>
-            {% for type in monitoring_types %}
-            <option value="{{ monitor_type.name }}">{{ type.name }}</option>
-            {% endfor %}
-        </select><br><br>
-        <label for="target_price">目标价格:</label>
-        <input type="text" id="target_price" name="target_price" required><br><br>
-        <label for="condition">提醒条件:</label>
-        <select id="condition" name="condition" required>
-            <option value=">">大于</option>
-            <option value=">=">大于等于</option>
-            <option value="<">小于</option>
-            <option value="<=">小于等于</option>
-        </select><br><br>
+        <input type="text" id="monitor_type" name="monitor_type" value="{{ request.args.get('monitor_type', '') }}"><br><br>
         <label for="is_active">是否监控:</label>
-        <select id="is_active" name="is_active" required>
-            <option value="true">是</option>
-            <option value="false">否</option>
+        <select id="is_active" name="is_active">
+            <option value="">全部</option>
+            <option value="1" {% if request.args.get('is_active') == '1' %}selected{% endif %}>是</option>
+            <option value="0" {% if request.args.get('is_active') == '0' %}selected{% endif %}>否</option>
         </select><br><br>
         <label for="is_displayed">是否显示:</label>
-        <select id="is_displayed" name="is_displayed" required>
-            <option value="true">是</option>
-            <option value="false">否</option>
+        <select id="is_displayed" name="is_displayed">
+            <option value="">全部</option>
+            <option value="1" {% if request.args.get('is_displayed') == '1' %}selected{% endif %}>是</option>
+            <option value="0" {% if request.args.get('is_displayed') == '0' %}selected{% endif %}>否</option>
         </select><br><br>
-        <input type="submit" value="设置">
+        <input type="submit" value="筛选">
     </form>
 
+    <!-- 监控列表 -->
     <h2>监控列表</h2>
     <table border="1">
         <tr>
+            <th>ID</th>
             <th>期货标的</th>
+            <th>中文名称</th>
             <th>期货代码</th>
             <th>监控类别</th>
-            <th>目标价格</th>
+            <th>单位</th>
+            <th>杠杆</th>
+            <th>一手保证金</th>
             <th>条件</th>
+            <th>目标价格</th>
+            <th>最新价格</th>
+            <th>更新时间</th>
             <th>创建时间</th>
             <th>是否监控</th>
             <th>操作</th>
         </tr>
         {% for record in records %}
         <tr>
+            <td>{{ record['id'] }}</td>
             <td>{{ record['symbol'] }}</td>
+            <td>{{ record['chinese_name'] }}</td>
             <td>{{ record['future_code'] }}</td>
             <td>{{ record['monitor_type'] }}</td>
-            <td>{{ record['target_price'] }}</td>
+            <td>{{ record['unit'] }}</td>
+            <td>{{ record['leverage'] }}</td>
+            <td>{{ record['margin'] }}</td>
             <td>{{ record['condition'] }}</td>
+            <td>{{ record['target_price'] }}</td>
+            <td>{{ record['latest_price'] }}</td>
+            <td>{{ record['updated_at'] }}</td>
             <td>{{ record['created_at'] }}</td>
             <td>{{ record['is_active'] }}</td>
             <td>
-                <a href="/edit_threshold/{{ record['id'] }}">编辑</a> |
-                <a href="/toggle_display/{{ record['id'] }}">取消显示</a>
+                <a href="/edit_threshold/{{ record['id'] }}">编辑</a>
             </td>
         </tr>
         {% endfor %}
     </table>
+
+    <!-- 其他页面的按钮 -->
+    <button id="addRecordBtn">添加记录</button><br>
+    <a href="/manage_future_info">基本信息</a><br>
+    <a href="/manage_monitoring_types">监控类别管理</a><br>
+
+    <!-- 添加记录弹窗 -->
+    <div id="addRecordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>添加记录</h2>
+            <form action="/add_record" method="post">
+                <label for="future_code">期货代码:</label>
+                <input type="text" id="future_code" name="future_code" required><br><br>
+                <label for="monitor_id">监控类别:</label>
+                <select id="monitor_id" name="monitor_id" required>
+                    {% for type in monitoring_types %}
+                    <option value="{{ type.id }}">{{ type.monitor_type }}</option>
+                    {% endfor %}
+                </select><br><br>
+                <label for="target_price">目标价格:</label>
+                <input type="text" id="target_price" name="target_price" required><br><br>
+                <label for="condition">提醒条件:</label>
+                <select id="condition" name="condition" required>
+                    <option value=">">大于</option>
+                    <option value=">=">大于等于</option>
+                    <option value="<">小于</option>
+                    <option value="<=">小于等于</option>
+                </select><br><br>
+                <label for="is_active">是否监控:</label>
+                <select id="is_active" name="is_active" required>
+                    <option value="1">是</option>
+                    <option value="0">否</option>
+                </select><br><br>
+                <label for="is_displayed">是否显示:</label>
+                <select id="is_displayed" name="is_displayed" required>
+                    <option value="1">是</option>
+                    <option value="0">否</option>
+                </select><br><br>
+                <input type="submit" value="添加">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 获取弹窗元素
+        var modal = document.getElementById("addRecordModal");
+
+        // 获取打开弹窗的按钮
+        var btn = document.getElementById("addRecordBtn");
+
+        // 获取关闭弹窗的元素
+        var span = document.getElementsByClassName("close")[0];
+
+        // 点击按钮打开弹窗
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // 点击 <span> (x) 关闭弹窗
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // 在用户点击弹窗外部时关闭弹窗
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>
